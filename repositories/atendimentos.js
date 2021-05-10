@@ -6,6 +6,10 @@ class Atendimentos{
         const sql =  'insert into Atendimentos set ?'
         return query(sql, atendimento)
     }
+
+    lista(){
+        return repositorio.lista()
+    }
 }
 
 module.exports = new Atendimentos()

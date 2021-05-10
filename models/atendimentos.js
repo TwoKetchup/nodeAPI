@@ -2,28 +2,13 @@ const moment = require('moment')
 const axios = require('axios')
 const conexao = require('../infraestrutura/databse/conexao')
 const repo = require('../repositories/atendimentos')
+const { query } = require('../infraestrutura/databse/conexao')
 
 class Atendimento {
     adiciona(atendimento) {
         const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss')
         const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss'
         )
-
-        const dataEhValida = moment(data).isSameOrAfter(dataCriacao)
-        const clienteEhValido = atendimento.cliente.length >= 5
-
-        const validacoes = [
-            {
-                nome: 'data',
-                valido: this.dataEhValida,
-                mensagem: 'Data deve ser maior ou igual a data atual'
-            },
-            {
-                nome: 'cliente',
-                valido: this.clienteEhValido,
-                mensagem: 'Cliente deve ter pelo menos cinco caracteres'
-            }
-        ]
 
         const erros = validacoes.filter(campo => !campo.valido)
         const existemErros = erros.length
@@ -55,18 +40,25 @@ class Atendimento {
                 const param = params[nome] 
                 return !campo.valido(param)
             })
+
+            this.validacoes = [
+                {
+                    nome: 'data',
+                    valido: this.dataEhValida,
+                    mensagem: 'Data deve ser maior ou igual a data atual'
+                },
+                {
+                    nome: 'cliente',
+                    valido: this.clienteEhValido,
+                    mensagem: 'Cliente deve ter pelo menos cinco caracteres'
+                }
+            ]
     }
 
-    lista(res) {
+    lista() {
         const sql = 'SELECT * FROM Atendimentos'
 
-        conexao.query(sql, (erro, resultados) => {
-            if (erro) {
-                res.status(400).json(erro)
-            } else {
-                res.status(200).json(resultados)
-            }
-        })
+        return query(sql)
     }
 
     buscaPorId(id, res) {
