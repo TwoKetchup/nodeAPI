@@ -8,7 +8,9 @@ class Atendimentos{
     }
 
     lista(){
-        return repositorio.lista()
+        const sql = 'SELECT * FROM Atendimentos'
+
+        return query(sql)
     }
 }
 

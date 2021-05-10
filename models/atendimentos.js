@@ -5,30 +5,6 @@ const repo = require('../repositories/atendimentos')
 const { query } = require('../infraestrutura/databse/conexao')
 
 class Atendimento {
-    adiciona(atendimento) {
-        const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss')
-        const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss'
-        )
-
-        const erros = validacoes.filter(campo => !campo.valido)
-        const existemErros = erros.length
-
-        if (existemErros) {
-            return new Promise((resolve, reject)=>{
-                reject(erros)
-            })
-        } else {
-            const atendimentoDatado = { ...atendimento, dataCriacao, data }
-
-            return repo.adiciona(atendimentoDatado)
-                .then(resultados =>{
-                    const id = resultados.insertId
-                    return {...atendimento, id}
-                })
-                
-        }
-    }
-
     constructor(){
         this.dataEhValida = ({data, dataCriacao})=> 
             moment(data).isSameOrAfter(dataCriacao)
@@ -55,10 +31,36 @@ class Atendimento {
             ]
     }
 
-    lista() {
-        const sql = 'SELECT * FROM Atendimentos'
+    adiciona(atendimento) {
+        const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss')
+        const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss')
 
-        return query(sql)
+        const params = {
+                data: { data, dataCriacao },
+                cliente: { tamanho: atendimento.cliente.length }
+        }
+
+        const erros = this.valida(params)
+        const existemErros = erros.length
+
+        if (existemErros) {
+            return new Promise((resolve, reject)=>{
+                reject(erros)
+            })
+        } else {
+            const atendimentoDatado = { ...atendimento, dataCriacao, data }
+
+            return repo.adiciona(atendimentoDatado)
+                .then(resultados =>{
+                    const id = resultados.insertId
+                    return {...atendimento, id}
+                })
+                
+        }
+    }
+
+    lista() {
+        return repo.lista()
     }
 
     buscaPorId(id, res) {
