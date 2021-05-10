@@ -4,7 +4,7 @@ const conexao = require('../infraestrutura/databse/conexao')
 const repo = require('../repositories/atendimentos')
 
 class Atendimento {
-    adiciona(atendimento, res) {
+    adiciona(atendimento) {
         const dataCriacao = moment().format('YYYY-MM-DD HH:MM:SS')
         const data = moment(atendimento.data, 'DD/MM/YYYY').format(
             'YYYY-MM-DD HH:MM:SS'
@@ -30,7 +30,9 @@ class Atendimento {
         const existemErros = erros.length
 
         if (existemErros) {
-            res.status(400).json(erros)
+            return new Promise((resolve, reject)=>{
+                reject(erros)
+            })
         } else {
             const atendimentoDatado = { ...atendimento, dataCriacao, data }
 
