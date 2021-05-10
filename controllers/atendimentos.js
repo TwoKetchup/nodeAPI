@@ -18,6 +18,7 @@ module.exports = app => {
             .then(atendimentoCadastrado => {
                 res.status(201).json(atendimentoCadastrado)
             })
+            .catch(erros => res.status(400).json)
     }) 
 
     app.patch('/atendimentos/:id', (req, res) => {
