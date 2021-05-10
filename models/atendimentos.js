@@ -5,9 +5,8 @@ const repo = require('../repositories/atendimentos')
 
 class Atendimento {
     adiciona(atendimento) {
-        const dataCriacao = moment().format('YYYY-MM-DD HH:MM:SS')
-        const data = moment(atendimento.data, 'DD/MM/YYYY').format(
-            'YYYY-MM-DD HH:MM:SS'
+        const dataCriacao = moment().format('YYYY-MM-DD HH:mm:ss')
+        const data = moment(atendimento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:mm:ss'
         )
 
         const dataEhValida = moment(data).isSameOrAfter(dataCriacao)
@@ -16,12 +15,12 @@ class Atendimento {
         const validacoes = [
             {
                 nome: 'data',
-                valido: dataEhValida,
+                valido: this.dataEhValida,
                 mensagem: 'Data deve ser maior ou igual a data atual'
             },
             {
                 nome: 'cliente',
-                valido: clienteEhValido,
+                valido: this.clienteEhValido,
                 mensagem: 'Cliente deve ter pelo menos cinco caracteres'
             }
         ]
@@ -43,6 +42,19 @@ class Atendimento {
                 })
                 
         }
+    }
+
+    constructor(){
+        this.dataEhValida = ({data, dataCriacao})=> 
+            moment(data).isSameOrAfter(dataCriacao)
+        this.clienteEhValido = tamanho => tamanho >=5
+
+        this.valida = params =>
+            this.validacoes.filter(campo =>{
+                const { nome } = campo
+                const param = params[nome] 
+                return !campo.valido(param)
+            })
     }
 
     lista(res) {
@@ -78,7 +90,7 @@ class Atendimento {
     altera(id, valores, res) {
         if (valores.data) {
             valores.data = moment(valores.data, 'DD/MM/YYYY').format(
-                'YYYY-MM-DD HH:MM:SS'
+                'YYYY-MM-DD HH:mm:ss'
             )
         }
         const sql = 'UPDATE Atendimentos SET ? WHERE id=?'
